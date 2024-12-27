@@ -1,0 +1,87 @@
+const recipeList = document.getElementById("recipeList");
+const addRecipeModal = document.getElementById("addRecipeModal");
+const closeModal = document.getElementById("closeModal");
+const addRecipeBtn = document.getElementById("addRecipeBtn");
+const recipeForm = document.getElementById("recipeForm");
+const searchBar = document.getElementById("searchBar");
+
+let recipes = [];
+
+// Open the modal to add a recipe
+addRecipeBtn.onclick = function() {
+  addRecipeModal.style.display = "block";
+};
+
+// Close the modal
+closeModal.onclick = function() {
+  addRecipeModal.style.display = "none";
+};
+
+// Handle recipe form submission
+recipeForm.onsubmit = function(event) {
+  event.preventDefault();
+
+  const recipeName = document.getElementById("recipeName").value;
+  const ingredients = document.getElementById("ingredients").value.split(",");
+  const instructions = document.getElementById("instructions").value;
+
+  const newRecipe = {
+    name: recipeName,
+    ingredients: ingredients,
+    instructions: instructions
+  };
+
+  recipes.push(newRecipe);
+  displayRecipes(recipes);
+  addRecipeModal.style.display = "none";
+  recipeForm.reset();
+};
+
+// Filter recipes by search term
+searchBar.addEventListener("input", function() {
+  const searchTerm = searchBar.value.toLowerCase();
+  const filteredRecipes = recipes.filter(recipe =>
+    recipe.name.toLowerCase().includes(searchTerm)
+  );
+  displayRecipes(filteredRecipes);
+});
+
+// Display all recipes
+function displayRecipes(recipeArray) {
+  recipeList.innerHTML = ""; // Clear existing recipes
+
+  recipeArray.forEach(recipe => {
+    const recipeCard = document.createElement("div");
+    recipeCard.classList.add("recipeCard");
+    
+    const recipeTitle = document.createElement("h3");
+    recipeTitle.textContent = recipe.name;
+    
+    const ingredientsList = document.createElement("ul");
+    recipe.ingredients.forEach(ingredient => {
+      const listItem = document.createElement("li");
+      listItem.textContent = ingredient.trim();
+      ingredientsList.appendChild(listItem);
+    });
+
+    const instructions = document.createElement("p");
+    instructions.textContent = recipe.instructions;
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete Recipe";
+    deleteButton.onclick = function() {
+      recipes = recipes.filter(r => r !== recipe);
+      displayRecipes(recipes);
+    };
+
+    recipeCard.appendChild(recipeTitle);
+    recipeCard.appendChild(ingredientsList);
+    recipeCard.appendChild(instructions);
+    recipeCard.appendChild(deleteButton);
+
+    recipeList.appendChild(recipeCard);
+  });
+}
+
+// Initialize page with empty recipes
+displayRecipes(recipes);
